@@ -1,6 +1,6 @@
 name: Deploy Now
 
-on: [push]
+on: [push, workflow_dispatch]
 
 jobs:
   deploy-now:
