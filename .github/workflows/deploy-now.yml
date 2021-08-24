@@ -13,11 +13,28 @@ jobs:
           service-host: api-eu.ionos.space
           project: 97af1620-cae6-48c4-9021-133e6abbc8de
           api-key: ${{ secrets.IONOS_API_KEY }}
+
       - name: checkout
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
         uses: actions/checkout@v2
         with:
           submodules: 'recursive'
+
+      - name: Setup composer
+        uses: php-actions/composer@v2
+
+      - name: Setup Node.js 14.x
+        if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Do stuff to deploy to ionos
+        if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
+        run: |
+          yarn install
+          yarn encore dev
+
       - name: Deploy build
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
         uses: ionos-deploy-now/deploy-to-ionos-action@v1
