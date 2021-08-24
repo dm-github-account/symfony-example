@@ -32,7 +32,8 @@ jobs:
       - name: Do stuff to deploy to ionos
         if: ${{ steps.project.outputs.deployment-enabled == 'true' }}
         run: |
-          yarn install
+          yarn config set network-timeout 120000 -g
+          yarn install --verbose
           yarn encore dev
 
       - name: Deploy build
