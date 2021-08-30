@@ -1,0 +1,9 @@
+deploy:
+  persistent_directories:
+    - var/log
+  excluded_directories:
+    - tests
+    - node_modules
+    - assets
+  remote_commands:
+    - php8.0 bin/console cache:clear
