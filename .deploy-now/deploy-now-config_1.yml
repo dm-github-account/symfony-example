@@ -1,0 +1,47 @@
+build:
+  dist-folder: ./
+
+bootstrap:
+  enabled:
+    all-builds: false
+    initial-build: true
+
+  dump-database: #not for mvp
+    source-branch: main
+    schema: app-db
+
+  copy-files: #not for mvp
+    source-branch: main
+    directories:
+      - storage
+      - other-dir
+
+  override-deploy-build-excludes:
+    - storage
+  override-deploy-build-excludes_2:
+    - tests
+    - node_modules
+
+  before-deploy-remote-commands:
+    - create SQL lite
+  after-deploy-remote-commands:
+    - seed DB
+
+deploy:
+  build-excludes: #(build-ignores)
+    - tests
+    - node_modules
+    - storage
+
+  run-excludes: #not for mvp
+    - dir-on-space
+
+  remote-commands:
+    - php8.0 artisan migrate --force
+    - php8.0 artisan cache:clear
+    - php8.0 artisan config:clear
+    - php8.0 artisan route:clear
+    - php8.0 artisan view:clear
+    - php8.0 artisan config:cache
+    - php8.0 artisan route:cache
+    - php8.0 artisan view:cache

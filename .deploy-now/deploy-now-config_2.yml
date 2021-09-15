@@ -1,0 +1,53 @@
+build:
+  dist-folder: ./
+
+force-bootstrap: true
+run-on: #force-bootstrap
+    regular-builds: false
+    initial-build: true
+
+bootstrap:
+  dump-database:
+    source-branch: main
+    schema: app-db
+
+  copy-files:
+    source-branch: main
+    directories:
+      - storage
+      - other-dir
+
+  build-excludes:
+    - tests
+    - node_modules
+
+  remote-commands:
+    - create SQL lite
+    - php8.0 artisan migrate --force
+    - php8.0 artisan cache:clear
+    - php8.0 artisan config:clear
+    - php8.0 artisan route:clear
+    - php8.0 artisan view:clear
+    - php8.0 artisan config:cache
+    - php8.0 artisan route:cache
+    - php8.0 artisan view:cache
+    - seed DB
+
+deploy:
+  build-excludes:
+    - tests
+    - node_modules
+    - storage
+
+  run-excludes:
+    - dir-on-space
+
+  remote-commands:
+    - php8.0 artisan migrate --force
+    - php8.0 artisan cache:clear
+    - php8.0 artisan config:clear
+    - php8.0 artisan route:clear
+    - php8.0 artisan view:clear
+    - php8.0 artisan config:cache
+    - php8.0 artisan route:cache
+    - php8.0 artisan view:cache
