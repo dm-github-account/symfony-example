@@ -2,6 +2,35 @@
 set -o pipefail
 
 CONFIG_FILE=".deploy-now/deploy-now-config.yml"
+DEPLOY_TYPE_BOOTSTRAP="bootstrap"
+DEPLOY_TYPE_REGULAR="regular"
+
+FORCE_BOOTSTRAP="false"
+if [[ -f $CONFIG_FILE ]] ; then
+  FB_FILTER=".deploy.force-bootstrap"
+  if [[ $FB_FILTER -eq "true" ]] ; then
+    FORCE_BOOTSTRAP="true"
+  fi
+fi
+
+FORCE_REGULAR="false"
+if [[ -f $CONFIG_FILE ]] ; then
+  FR_FILTER=".deploy.force-regular"
+  if [[ FR_FILTER -eq "true" ]] ; then
+    FORCE_REGULAR="true"
+  fi
+fi
+
+DEPLOY_TYPE=$DEPLOY_TYPE_REGULAR
+if [[ $FORCE_BOOTSTRAP -eq "true" ]] | [[ $BOOTSTRAP_DEPLOY -eq "true" ]] ; then
+  DEPLOY_TYPE=$DEPLOY_TYPE_BOOTSTRAP
+fi
+if [[ $FORCE_REGULAR -eq "true" ]] ; then
+  DEPLOY_TYPE=$DEPLOY_TYPE_REGULAR
+fi
+echo "Used deployment type: ($DEPLOY_TYPE)"
+
+
 
 EXCLUDE_DIRECTORIES=""
 if [[ -f $CONFIG_FILE ]] ; then
@@ -53,7 +82,7 @@ export SSHPASS=$password
 if [[ -f $CONFIG_FILE ]] ; then
   PD_FILTER=".deploy.persistent_directories"
   if [[ "$(yq e -o=json $CONFIG_FILE | jq $PD_FILTER)" != "null" ]] ; then
-    yq e -o=json $CONFIG_FILE | jq $PD_FILTER | jq -r '.[]' | rsync -av --rsh="/usr/bin/sshpass -e ssh -o StrictHostKeyChecking=no" --files-from=- -r --ignore-existing $DIST_FOLDER $USERNAME@$REMOTE_HOST:
+    yq e -o=json $CONFIG_FILE | jq $PD_FILTER | jq -r '.[]' | rsync -av --rsh="/usr/bin/sshpass -e ssh -o StrictHostKeyChecking=no" --files-from=/dev/stdin -r --ignore-existing $DIST_FOLDER $USERNAME@$REMOTE_HOST:
   fi
 fi
 

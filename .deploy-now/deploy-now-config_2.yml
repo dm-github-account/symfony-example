@@ -2,16 +2,14 @@ build:
   dist-folder: ./
 
 force-bootstrap: true
-run-on: #force-bootstrap
-    regular-builds: false
-    initial-build: true
+force-deploy: true
 
 bootstrap:
-  dump-database:
+  dump-database: #not for mvp
     source-branch: main
     schema: app-db
 
-  copy-files:
+  copy-files: #not for mvp
     source-branch: main
     directories:
       - storage
@@ -39,7 +37,7 @@ deploy:
     - node_modules
     - storage
 
-  run-excludes:
+  run-excludes: #not for mvp
     - dir-on-space
 
   remote-commands:
