@@ -1,9 +1,11 @@
+#docs: https://docs.ionos.space/tbd
+deploy-now-config-version: 1.0
+
 build:
   dist-folder: ./
 
 deploy:
-  force-bootstrap: false
-  force-regular: false
+  force: bootstrap/regular
 
   bootstrap:
     dump-database: #not for mvp
@@ -32,7 +34,7 @@ deploy:
       - php8.0 artisan view:cache
       - seed DB
 
-  regular:
+  regular: #alternative name: default
     build-excludes:
       - tests
       - node_modules
