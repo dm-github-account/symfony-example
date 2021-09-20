@@ -45,6 +45,7 @@ if [[ -f $CONFIG_FILE ]] ; then
   fi
 fi
 
+#add existing folders in space to size calculation
 deployment_size=$(du -s -B1 --exclude=.deploy-now --exclude=.git --exclude=.github $EXCLUDE_DIRECTORIES $DIST_FOLDER | cut -f 1)
 
 if [[ $deployment_size -gt $STORAGE_QUOTA ]] ; then
@@ -79,12 +80,6 @@ export SSHPASS=$password
 
 
 
-if [[ -f $CONFIG_FILE ]] ; then
-  PD_FILTER=".deploy.persistent_directories"
-  if [[ "$(yq e -o=json $CONFIG_FILE | jq $PD_FILTER)" != "null" ]] ; then
-    yq e -o=json $CONFIG_FILE | jq $PD_FILTER | jq -r '.[]' | rsync -av --rsh="/usr/bin/sshpass -e ssh -o StrictHostKeyChecking=no" --files-from=/dev/stdin -r --ignore-existing $DIST_FOLDER $USERNAME@$REMOTE_HOST:
-  fi
-fi
 
 echo "rsync -av --delete --exclude=logs --rsh=\"/usr/bin/sshpass -e ssh -o StrictHostKeyChecking=no\" --exclude=.deploy-now --exclude=.git --exclude=.github $EXCLUDE_DIRECTORIES $DIST_FOLDER $USERNAME@$REMOTE_HOST:"
 rsync -av --delete --exclude=logs --rsh="/usr/bin/sshpass -e ssh -o StrictHostKeyChecking=no" --exclude=.deploy-now --exclude=.git --exclude=.github $EXCLUDE_DIRECTORIES $DIST_FOLDER $USERNAME@$REMOTE_HOST:
